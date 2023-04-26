@@ -1,0 +1,1 @@
+rootProject.name = "org.beamborg.beamborg-server"
