@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 import { useParams } from "react-router-dom";
 
-const BEAMBORG_SERVER = "http://192.168.0.225:8080";
+const BEAMBORG_SERVER = "/api/v1";
 
 type BeamSession = { id: string; content?: string };
 

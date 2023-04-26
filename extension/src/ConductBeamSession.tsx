@@ -1,22 +1,24 @@
 import React, { useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
-const SERVER_IP = "http://192.168.0.225";
-const BEAMBORG_SERVER = `${SERVER_IP}:8080`;
-const BEAMBORG_UI = `${SERVER_IP}:5174`;
+// const SERVER_URL = "https://beamborg.fly.dev";
+const SERVER_URL = "http://192.168.0.225:8080";
 
 type BeamSession = { id: string; content?: string };
 
 const createNewSession = async () => {
-  const response = await fetch(`${BEAMBORG_SERVER}/session/new`, {
+  const response = await fetch(`${SERVER_URL}/api/v1/session/new`, {
     method: "POST",
   });
   const asJson: BeamSession = await response.json();
   return asJson.id;
 };
 
-const getBeamSessionUrl = (sessionId: string, baseUrl = BEAMBORG_SERVER) =>
-  `${baseUrl}/session/${sessionId}`;
+const getBeamSessionUrl = (sessionId: string) =>
+  `${SERVER_URL}/api/v1/session/${sessionId}`;
+
+const getBeamSessionUIUrl = (sessionId: string) =>
+  `${SERVER_URL}/session/${sessionId}`;
 
 const fetchBeamSession = async (sessionId: string): Promise<BeamSession> => {
   const response = await fetch(getBeamSessionUrl(sessionId));
@@ -60,9 +62,7 @@ export const ConductBeamSession: React.FC<{
     }
   }, [sessionId]);
 
-  const sessionUIUrl = sessionId
-    ? getBeamSessionUrl(sessionId, BEAMBORG_UI)
-    : "";
+  const sessionUIUrl = sessionId ? getBeamSessionUIUrl(sessionId) : "";
   return (
     <div>
       {sessionId && (

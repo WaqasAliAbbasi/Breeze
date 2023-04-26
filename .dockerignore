@@ -1,0 +1,90 @@
+# flyctl launch added from extension/.gitignore
+# Logs
+extension/**/logs
+extension/**/*.log
+extension/**/npm-debug.log*
+extension/**/yarn-debug.log*
+extension/**/yarn-error.log*
+extension/**/pnpm-debug.log*
+extension/**/lerna-debug.log*
+
+extension/**/node_modules
+extension/**/dist
+extension/**/dist-ssr
+extension/**/*.local
+
+# Editor directories and files
+extension/**/.vscode/*
+!extension/**/.vscode/extensions.json
+extension/**/.idea
+extension/**/.DS_Store
+extension/**/*.suo
+extension/**/*.ntvs*
+extension/**/*.njsproj
+extension/**/*.sln
+extension/**/*.sw?
+
+# flyctl launch added from server/.gitignore
+server/**/.gradle
+server/**/build
+!server/**/gradle/wrapper/gradle-wrapper.jar
+!server/**/**/src/main/**/build
+!server/**/**/src/test/**/build
+
+### STS ###
+server/**/.apt_generated
+server/**/.classpath
+server/**/.factorypath
+server/**/.project
+server/**/.settings
+server/**/.springBeans
+server/**/.sts4-cache
+server/**/bin
+!server/**/**/src/main/**/bin
+!server/**/**/src/test/**/bin
+
+### IntelliJ IDEA ###
+server/**/.idea
+server/**/*.iws
+server/**/*.iml
+server/**/*.ipr
+server/**/out
+!server/**/**/src/main/**/out
+!server/**/**/src/test/**/out
+
+### NetBeans ###
+server/nbproject/private
+server/nbbuild
+server/dist
+server/nbdist
+server/.nb-gradle
+
+### VS Code ###
+server/**/.vscode
+
+# flyctl launch added from web/.gitignore
+# Logs
+web/**/logs
+web/**/*.log
+web/**/npm-debug.log*
+web/**/yarn-debug.log*
+web/**/yarn-error.log*
+web/**/pnpm-debug.log*
+web/**/lerna-debug.log*
+
+web/**/node_modules
+web/**/dist
+web/**/dist-ssr
+web/**/*.local
+
+# Editor directories and files
+web/**/.vscode/*
+!web/**/.vscode/extensions.json
+web/**/.idea
+web/**/.DS_Store
+web/**/*.suo
+web/**/*.ntvs*
+web/**/*.njsproj
+web/**/*.sln
+web/**/*.sw?
+fly.toml

@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet, Link } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import { SessionPage } from "./pages/SessionPage";
 
 function App() {
@@ -14,24 +14,6 @@ function App() {
 }
 
 export default App;
-
-function Layout() {
-  return (
-    <div>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/nothing-here">Nothing Here</Link>
-          </li>
-        </ul>
-      </nav>
-      <Outlet />
-    </div>
-  );
-}
 
 function Home() {
   return (
