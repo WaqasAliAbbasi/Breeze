@@ -5,7 +5,6 @@ info:
 paths:
   /api/v1/session/new:
     post:
-      description: "Creates a new beam session"
       responses:
         "201":
           description: "Created"
@@ -15,7 +14,6 @@ paths:
                 $ref: "#/components/schemas/BeamSession"
   /api/v1/session/{id}:
     get:
-      description: "Returns a customer by its ID"
       parameters:
         - name: "id"
           in: "path"
@@ -29,8 +27,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BeamSession"
-    patch:
-      description: "Patch a customer by its ID"
+  /api/v1/session/{id}/upload:
+    post:
       parameters:
         - name: "id"
           in: "path"
@@ -38,19 +36,28 @@ paths:
           schema:
             type: "string"
       requestBody:
-        description: "A JSON object containing session content"
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: "#/components/schemas/BeamSessionUpdate"
+              type: object
+              properties:
+                text:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+            encoding:
+              image:
+                contentType: image/png
       responses:
         "200":
           description: "OK"
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: "#/components/schemas/BeamSession"
+                type: string
+                example: OK
 components:
   schemas:
     BeamSession:
@@ -59,11 +66,7 @@ components:
       properties:
         id:
           type: "string"
-        content:
+        type:
           type: "string"
-    BeamSessionUpdate:
-      type: "object"
-      required: [ "content" ]
-      properties:
         content:
           type: "string"
