@@ -1,6 +1,8 @@
 import React from "react";
 import "./App.css";
 import { useParams } from "react-router-dom";
+import { Excalidraw, exportToBlob } from "@excalidraw/excalidraw";
+import { ExcalidrawAPIRefValue } from "@excalidraw/excalidraw/types/types";
 
 const BEAMBORG_SERVER = "/api/v1";
 
@@ -36,7 +38,9 @@ export const SessionPage = () => {
     null
   );
   const [textData, setTextData] = React.useState<string | null>(null);
-  const [image, setImage] = React.useState<File | null>(null);
+  const [image, setImage] = React.useState<Blob | null>(null);
+  const [excalidrawAPI, setExcalidrawAPI] =
+    React.useState<ExcalidrawAPIRefValue | null>(null);
 
   const updateBeamSessionText = () => {
     if (sessionId && textData) {
@@ -79,6 +83,33 @@ export const SessionPage = () => {
     setImage(event.target.files[0]);
   };
 
+  const beamDrawing = async () => {
+    if (!sessionId || !excalidrawAPI?.readyPromise) {
+      return;
+    }
+    const elements = (await excalidrawAPI.readyPromise).getSceneElements();
+    if (!elements || !elements.length) {
+      return;
+    }
+    const blob = await exportToBlob({
+      elements,
+      appState: {
+        exportWithDarkMode: false,
+      },
+      files: (await excalidrawAPI.readyPromise).getFiles(),
+      getDimensions: () => {
+        return { width: 350, height: 350 };
+      },
+    });
+    const formData = new FormData();
+    formData.append("image", blob);
+    updateBeamSessionContent(sessionId, formData).then(() =>
+      fetchBeamSession(sessionId).then((beamSessionResponse) =>
+        setBeamSession(beamSessionResponse)
+      )
+    );
+  };
+
   return (
     <>
       <h1>BeamBorg</h1>
@@ -100,6 +131,10 @@ export const SessionPage = () => {
           onChange={onSelectFile}
         ></input>
         <button onClick={updateBeamSessionImage}>Beam Image</button>
+        <div style={{ height: "500px" }}>
+          <Excalidraw ref={(api) => setExcalidrawAPI(api)} />
+        </div>
+        <button onClick={beamDrawing}>Beam Drawing</button>
       </div>
     </>
   );
