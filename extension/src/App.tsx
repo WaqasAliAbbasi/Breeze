@@ -4,6 +4,7 @@ import { ConductBeamSession } from "./ConductBeamSession";
 
 function App() {
   const [data, setData] = useState<ClipboardItem | null>(null);
+  const [dataAsBlob, setDataAsBlob] = useState<Blob | null>(null);
 
   const setTextClipboardItem = (text: string) =>
     setData(
@@ -12,12 +13,14 @@ function App() {
       })
     );
 
-  const setBlobClipboardItem = (blob: Blob) =>
+  const setBlobClipboardItem = (blob: Blob) => {
+    setDataAsBlob(blob);
     setData(
       new ClipboardItem({
         [blob.type]: blob,
       })
     );
+  };
 
   const onCopyAndClose = () => {
     if (data) {
@@ -42,6 +45,9 @@ function App() {
       />
       {data && <h3>Data Fetched</h3>}
       {data && <p>Type: {data.types}</p>}
+      {data && dataAsBlob && (
+        <img src={URL.createObjectURL(dataAsBlob)} width="80%" />
+      )}
       <div className="card">
         <button onClick={() => onCopyAndClose()} disabled={!data}>
           Copy and Close

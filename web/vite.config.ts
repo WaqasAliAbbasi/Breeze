@@ -7,8 +7,8 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     proxy: {
-      "/api": {
-        target: "http://127.0.0.1:8080",
+      "/api/v1": {
+        target: "http://DESKTOP-CF5B18H.mshome.net:8080",
         changeOrigin: true,
         secure: false,
       },

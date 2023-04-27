@@ -17,17 +17,17 @@ const fetchBeamSession = async (sessionId: string): Promise<BeamSession> => {
 
 const updateBeamSessionContent = async (
   sessionId: string,
-  text: string
-): Promise<BeamSession> => {
-  const response = await fetch(getBeamSessionUrl(sessionId), {
-    method: "PATCH",
-    body: JSON.stringify({ content: text }),
-    headers: {
-      "Content-type": "application/json; charset=UTF-8",
-    },
-  });
-  const asJson: BeamSession = await response.json();
-  return asJson;
+  formData: FormData
+): Promise<string> => {
+  const response = await fetch(
+    `${BEAMBORG_SERVER}/session/${sessionId}/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+  const textResponse = await response.text();
+  return textResponse;
 };
 
 export const SessionPage = () => {
@@ -36,14 +36,32 @@ export const SessionPage = () => {
     null
   );
   const [textData, setTextData] = React.useState<string | null>(null);
+  const [image, setImage] = React.useState<File | null>(null);
 
-  const updateBeamSession = () => {
+  const updateBeamSessionText = () => {
     if (sessionId && textData) {
-      updateBeamSessionContent(sessionId, textData).then(
-        (beamSessionResponse) => setBeamSession(beamSessionResponse)
+      const formData = new FormData();
+      formData.append("text", textData);
+      updateBeamSessionContent(sessionId, formData).then(() =>
+        fetchBeamSession(sessionId).then((beamSessionResponse) =>
+          setBeamSession(beamSessionResponse)
+        )
       );
     }
   };
+
+  const updateBeamSessionImage = () => {
+    if (sessionId && image) {
+      const formData = new FormData();
+      formData.append("image", image);
+      updateBeamSessionContent(sessionId, formData).then(() =>
+        fetchBeamSession(sessionId).then((beamSessionResponse) =>
+          setBeamSession(beamSessionResponse)
+        )
+      );
+    }
+  };
+
   React.useEffect(() => {
     if (sessionId) {
       fetchBeamSession(sessionId).then((beamSessionResponse) =>
@@ -52,18 +70,36 @@ export const SessionPage = () => {
     }
   }, [sessionId]);
 
+  const onSelectFile: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    if (!event.target.files || event.target.files.length === 0) {
+      setImage(null);
+      return;
+    }
+
+    setImage(event.target.files[0]);
+  };
+
   return (
     <>
       <h1>BeamBorg</h1>
       <div className="card">
-        <p>{JSON.stringify(beamSession)}</p>
+        <p>{JSON.stringify(beamSession).slice(0, 100)}</p>
         <textarea
           rows={4}
           cols={50}
           value={textData || ""}
           onChange={(event) => setTextData(event.target.value)}
         ></textarea>
-        <button onClick={updateBeamSession}>Beam</button>
+        <button onClick={updateBeamSessionText}>Beam Text</button>
+        <br />
+        <input
+          type="file"
+          id="img"
+          name="img"
+          accept="image/png"
+          onChange={onSelectFile}
+        ></input>
+        <button onClick={updateBeamSessionImage}>Beam Image</button>
       </div>
     </>
   );

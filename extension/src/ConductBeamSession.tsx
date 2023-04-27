@@ -4,7 +4,11 @@ import { QRCodeSVG } from "qrcode.react";
 // const SERVER_URL = "https://beamborg.fly.dev";
 const SERVER_URL = "http://192.168.0.225:8080";
 
-type BeamSession = { id: string; content?: string };
+type BeamSession = {
+  id: string;
+  type?: "Text" | "Image";
+  content?: string;
+};
 
 const createNewSession = async () => {
   const response = await fetch(`${SERVER_URL}/api/v1/session/new`, {
@@ -29,7 +33,7 @@ const fetchBeamSession = async (sessionId: string): Promise<BeamSession> => {
 export const ConductBeamSession: React.FC<{
   setTextClipboardItem: (text: string) => void;
   setBlobClipboardItem: (blob: Blob) => void;
-}> = ({ setTextClipboardItem }) => {
+}> = ({ setTextClipboardItem, setBlobClipboardItem }) => {
   const interval = React.useRef<number | null>(null);
   const [sessionId, setSessionId] = React.useState<string | null>(null);
   const onStart = async () => {
@@ -40,11 +44,18 @@ export const ConductBeamSession: React.FC<{
   const pollBeamSession = async () => {
     if (sessionId) {
       const beamSession = await fetchBeamSession(sessionId);
-      if (beamSession.content) {
+      if (beamSession.type && beamSession.content) {
         if (interval.current) {
           clearInterval(interval.current);
         }
-        setTextClipboardItem(beamSession.content);
+        if (beamSession.type == "Text") {
+          setTextClipboardItem(beamSession.content);
+        } else {
+          const base64Response = await fetch(
+            `data:image/png;base64,${beamSession.content}`
+          );
+          setBlobClipboardItem(await base64Response.blob());
+        }
       }
     }
   };
