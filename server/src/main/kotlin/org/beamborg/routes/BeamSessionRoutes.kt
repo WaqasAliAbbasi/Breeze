@@ -26,13 +26,6 @@ private fun updateBeamSessionContent(id: String, type: BeamSessionContentType, c
 
 fun Route.beamSessionRouting() {
     route("/session") {
-        get {
-            if (beamSessionsStorage.isNotEmpty()) {
-                call.respond(beamSessionsStorage)
-            } else {
-                call.respondText("No sessions found", status = HttpStatusCode.OK)
-            }
-        }
         get("{id?}") {
             val id = call.parameters["id"] ?: return@get call.respondText(
                 "Missing id",
@@ -49,11 +42,6 @@ fun Route.beamSessionRouting() {
             val beamSession = BeamSession(id=java.util.UUID.randomUUID().toString().slice(IntRange(0,7)))
             beamSessionsStorage.add(beamSession)
             call.respond(HttpStatusCode.Created, beamSession)
-        }
-        post {
-            val beamSession = call.receive<BeamSession>()
-            beamSessionsStorage.add(beamSession)
-            call.respondText("Session stored correctly", status = HttpStatusCode.Created)
         }
         post("{id?}/upload") {
             val id = call.parameters["id"] ?: return@post call.respondText(
