@@ -62,7 +62,7 @@ components:
   schemas:
     BeamSession:
       type: "object"
-      required: ["id"]
+      required: [ "id" ]
       properties:
         id:
           type: "string"

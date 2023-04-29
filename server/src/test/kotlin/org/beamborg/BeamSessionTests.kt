@@ -4,31 +4,51 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
-import io.ktor.server.testing.*
-import kotlin.test.*
 import io.ktor.http.*
-import kotlinx.serialization.json.Json
+import io.ktor.server.testing.*
 import kotlinx.serialization.decodeFromString
-import org.beamborg.dao.DAOFacade
-import org.beamborg.dao.DAOFacadeImpl
+import kotlinx.serialization.json.Json
+import org.beamborg.dao.BeamSessionRepository
 import org.beamborg.models.BeamSession
 import org.beamborg.models.BeamSessionContentType
-
-import org.beamborg.plugins.*
+import org.beamborg.plugins.appModule
+import org.beamborg.plugins.configureDatabase
+import org.beamborg.plugins.configureRouting
+import org.beamborg.plugins.configureSerialization
+import org.koin.core.context.GlobalContext.startKoin
+import org.koin.core.context.GlobalContext.stopKoin
+import org.koin.test.KoinTest
+import org.koin.test.inject
 import java.io.File
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-class BeamSessionTests {
+class BeamSessionTests : KoinTest {
     private val json = Json { encodeDefaults = true }
-    private val existingSession = BeamSession(id="123")
-    private var dao: DAOFacade
+    private val existingSession = BeamSession(id = "123")
+    private val repository: BeamSessionRepository by inject()
+
     init {
         configureDatabase()
-        dao = DAOFacadeImpl()
+    }
+
+    @BeforeTest
+    fun setup() {
+        startKoin {
+            modules(appModule)
+        }
+    }
+
+    @AfterTest
+    fun teardown() {
+        stopKoin()
     }
 
     private suspend fun beforeTest() {
-        dao.deleteAllBeamSessions()
-        dao.addNewBeamSession(existingSession.id, existingSession.type, existingSession.content)
+        repository.deleteAllBeamSessions()
+        repository.addNewBeamSession(existingSession.id, existingSession.type, existingSession.content)
     }
 
     @Test
@@ -80,16 +100,21 @@ class BeamSessionTests {
         }
         beforeTest()
         val response = client.post("/api/v1/session/123/upload") {
-            setBody(MultiPartFormDataContent(
-                formData {
-                    append("text", "Some new content")
-                },
-                boundary = "WebAppBoundary"
-            ))
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append("text", "Some new content")
+                    },
+                    boundary = "WebAppBoundary"
+                )
+            )
         }
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals("Uploaded", response.body())
-        assertEquals(dao.beamSession("123"), BeamSession(id="123", type=BeamSessionContentType.Text, content="Some new content"))
+        assertEquals(
+            repository.beamSession("123"),
+            BeamSession(id = "123", type = BeamSessionContentType.Text, content = "Some new content")
+        )
     }
 
     @Test
@@ -101,21 +126,23 @@ class BeamSessionTests {
         beforeTest()
         val testImage = File({}.javaClass.getResource("/test.png")?.file!!)
         val response = client.post("/api/v1/session/123/upload") {
-            setBody(MultiPartFormDataContent(
-                formData {
-                    append("image",testImage.readBytes(), Headers.build {
-                        append(HttpHeaders.ContentType, "image/png")
-                        append(HttpHeaders.ContentDisposition, "filename=\"test.png\"")
-                    })
-                },
-                boundary = "WebAppBoundary"
-            ))
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append("image", testImage.readBytes(), Headers.build {
+                            append(HttpHeaders.ContentType, "image/png")
+                            append(HttpHeaders.ContentDisposition, "filename=\"test.png\"")
+                        })
+                    },
+                    boundary = "WebAppBoundary"
+                )
+            )
         }
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals("Uploaded", response.body())
-        val beamSession = dao.beamSession("123")
+        val beamSession = repository.beamSession("123")
         assertEquals(beamSession?.type, BeamSessionContentType.Image)
-        assertEquals(beamSession?.content?.isNotEmpty(),true)
+        assertEquals(beamSession?.content?.isNotEmpty(), true)
     }
 
     @Test

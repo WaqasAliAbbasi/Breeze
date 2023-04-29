@@ -1,11 +1,13 @@
 package org.beamborg.dao
 
 import org.beamborg.dao.DatabaseFactory.dbQuery
-import org.beamborg.models.*
-import kotlinx.coroutines.runBlocking
+import org.beamborg.models.BeamSession
+import org.beamborg.models.BeamSessionContentType
+import org.beamborg.models.BeamSessions
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-class DAOFacadeImpl : DAOFacade {
+
+class BeamSessionRepositoryImpl : BeamSessionRepository {
     private fun resultRowToArticle(row: ResultRow) = BeamSession(
         id = row[BeamSessions.id],
         type = row[BeamSessions.type],
@@ -23,14 +25,15 @@ class DAOFacadeImpl : DAOFacade {
             .singleOrNull()
     }
 
-    override suspend fun addNewBeamSession(id: String, type: BeamSessionContentType?, content: String?): BeamSession = dbQuery {
-        val insertStatement = BeamSessions.insert {
-            it[BeamSessions.id] = id
-            it[BeamSessions.type] = type
-            it[BeamSessions.content] = content
+    override suspend fun addNewBeamSession(id: String, type: BeamSessionContentType?, content: String?): BeamSession =
+        dbQuery {
+            val insertStatement = BeamSessions.insert {
+                it[BeamSessions.id] = id
+                it[BeamSessions.type] = type
+                it[BeamSessions.content] = content
+            }
+            insertStatement.resultedValues?.singleOrNull()?.let(::resultRowToArticle)!!
         }
-        insertStatement.resultedValues?.singleOrNull()?.let(::resultRowToArticle)!!
-    }
 
     override suspend fun editBeamSession(id: String, type: BeamSessionContentType, content: String) = dbQuery {
         BeamSessions.update({ BeamSessions.id eq id }) {
