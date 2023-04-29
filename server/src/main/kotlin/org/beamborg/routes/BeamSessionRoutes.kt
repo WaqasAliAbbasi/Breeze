@@ -1,30 +1,25 @@
 package org.beamborg.routes
 
 import io.ktor.server.routing.*
-import org.beamborg.models.beamSessionsStorage
 
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
-import kotlinx.serialization.Serializable
+import org.beamborg.dao.DAOFacadeImpl
 import org.beamborg.models.BeamSession
 import org.beamborg.models.BeamSessionContentType
 import java.util.*
 
-@Serializable
-data class BeamSessionUpdate(val content: String)
-
-private fun updateBeamSessionContent(id: String, type: BeamSessionContentType, content: String): BeamSession {
-    val beamSession =
-        beamSessionsStorage.find { it.id == id }!!
-    val modifiedBeamSession = beamSession.copy(type = type, content = content)
-    beamSessionsStorage[beamSessionsStorage.indexOf(beamSession)] = modifiedBeamSession
-    return modifiedBeamSession
+private suspend fun updateBeamSessionContent(id: String, type: BeamSessionContentType, content: String): BeamSession {
+    val dao = DAOFacadeImpl()
+    dao.editBeamSession(id, type, content)
+    return dao.beamSession(id)!!
 }
 
 fun Route.beamSessionRouting() {
+    val dao = DAOFacadeImpl()
     route("/session") {
         get("{id?}") {
             val id = call.parameters["id"] ?: return@get call.respondText(
@@ -32,15 +27,14 @@ fun Route.beamSessionRouting() {
                 status = HttpStatusCode.BadRequest
             )
             val beamSession =
-                beamSessionsStorage.find { it.id == id } ?: return@get call.respondText(
+                dao.beamSession(id) ?: return@get call.respondText(
                     "No session with id $id",
                     status = HttpStatusCode.NotFound
                 )
             call.respond(beamSession)
         }
         post("/new") {
-            val beamSession = BeamSession(id=java.util.UUID.randomUUID().toString().slice(IntRange(0,7)))
-            beamSessionsStorage.add(beamSession)
+            val beamSession = dao.addNewBeamSession(id=UUID.randomUUID().toString().slice(IntRange(0,7)), type=null, content = null)
             call.respond(HttpStatusCode.Created, beamSession)
         }
         post("{id?}/upload") {
@@ -54,7 +48,7 @@ fun Route.beamSessionRouting() {
                 return@post call.respondText("Invalid number of files", status = HttpStatusCode.BadRequest)
             }
 
-            beamSessionsStorage.find { it.id == id } ?: return@post call.respondText(
+            dao.beamSession(id)  ?: return@post call.respondText(
                 "No session with id $id",
                 status = HttpStatusCode.NotFound
             )

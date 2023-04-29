@@ -9,21 +9,26 @@ import kotlin.test.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.decodeFromString
+import org.beamborg.dao.DAOFacade
+import org.beamborg.dao.DAOFacadeImpl
 import org.beamborg.models.BeamSession
 import org.beamborg.models.BeamSessionContentType
-import org.beamborg.models.beamSessionsStorage
 
 import org.beamborg.plugins.*
 import java.io.File
-import java.net.URL
 
 class BeamSessionTests {
     private val json = Json { encodeDefaults = true }
-    private val existingSession = BeamSession(id="123", type=BeamSessionContentType.Text, content="Something Random")
-    @BeforeTest
-    fun beforeTest() {
-        beamSessionsStorage.clear()
-        beamSessionsStorage.add(existingSession)
+    private val existingSession = BeamSession(id="123")
+    private var dao: DAOFacade
+    init {
+        configureDatabase()
+        dao = DAOFacadeImpl()
+    }
+
+    private suspend fun beforeTest() {
+        dao.deleteAllBeamSessions()
+        dao.addNewBeamSession(existingSession.id, existingSession.type, existingSession.content)
     }
 
     @Test
@@ -32,6 +37,7 @@ class BeamSessionTests {
             configureRouting()
             configureSerialization()
         }
+        beforeTest()
         client.post("/api/v1/session/new").apply {
             val receivedResponse = json.decodeFromString<BeamSession>(bodyAsText())
             assertEquals(HttpStatusCode.Created, status)
@@ -45,7 +51,7 @@ class BeamSessionTests {
             configureRouting()
             configureSerialization()
         }
-
+        beforeTest()
         client.get("/api/v1/session/123").apply {
             val expectedResponse = json.encodeToString(BeamSession.serializer(), existingSession)
             assertEquals(HttpStatusCode.OK, status)
@@ -59,7 +65,7 @@ class BeamSessionTests {
             configureRouting()
             configureSerialization()
         }
-
+        beforeTest()
         client.get("/api/v1/session/007").apply {
             assertEquals(HttpStatusCode.NotFound, status)
             assertEquals("No session with id 007", body())
@@ -72,8 +78,7 @@ class BeamSessionTests {
             configureRouting()
             configureSerialization()
         }
-        val existingSession = BeamSession(id="123")
-        beamSessionsStorage.add(existingSession)
+        beforeTest()
         val response = client.post("/api/v1/session/123/upload") {
             setBody(MultiPartFormDataContent(
                 formData {
@@ -84,7 +89,7 @@ class BeamSessionTests {
         }
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals("Uploaded", response.body())
-        assertEquals(beamSessionsStorage[0], BeamSession(id="123", type=BeamSessionContentType.Text, content="Some new content"))
+        assertEquals(dao.beamSession("123"), BeamSession(id="123", type=BeamSessionContentType.Text, content="Some new content"))
     }
 
     @Test
@@ -93,8 +98,7 @@ class BeamSessionTests {
             configureRouting()
             configureSerialization()
         }
-        val existingSession = BeamSession(id="123")
-        beamSessionsStorage.add(existingSession)
+        beforeTest()
         val testImage = File({}.javaClass.getResource("/test.png")?.file!!)
         val response = client.post("/api/v1/session/123/upload") {
             setBody(MultiPartFormDataContent(
@@ -109,8 +113,9 @@ class BeamSessionTests {
         }
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals("Uploaded", response.body())
-        assertEquals(beamSessionsStorage[0].type, BeamSessionContentType.Image)
-        assertEquals(beamSessionsStorage[0].content?.isNotEmpty(),true)
+        val beamSession = dao.beamSession("123")
+        assertEquals(beamSession?.type, BeamSessionContentType.Image)
+        assertEquals(beamSession?.content?.isNotEmpty(),true)
     }
 
     @Test
@@ -119,20 +124,21 @@ class BeamSessionTests {
             configureRouting()
             configureSerialization()
         }
-        val existingSession = BeamSession(id="123")
-        beamSessionsStorage.add(existingSession)
+        beforeTest()
         val testImage = File({}.javaClass.getResource("/test.png")?.file!!)
         val response = client.post("/api/v1/session/123/upload") {
-            setBody(MultiPartFormDataContent(
-                formData {
-                    append("text", "Some new content")
-                    append("image",testImage.readBytes(), Headers.build {
-                        append(HttpHeaders.ContentType, "image/png")
-                        append(HttpHeaders.ContentDisposition, "filename=\"test.png\"")
-                    })
-                },
-                boundary = "WebAppBoundary"
-            ))
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append("text", "Some new content")
+                        append("image", testImage.readBytes(), Headers.build {
+                            append(HttpHeaders.ContentType, "image/png")
+                            append(HttpHeaders.ContentDisposition, "filename=\"test.png\"")
+                        })
+                    },
+                    boundary = "WebAppBoundary"
+                )
+            )
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
         assertEquals("Invalid number of files", response.body())
