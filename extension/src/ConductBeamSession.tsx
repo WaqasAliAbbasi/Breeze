@@ -77,13 +77,9 @@ export const ConductBeamSession: React.FC<{
   return (
     <div>
       {sessionId && (
-        <>
+        <a href={sessionUIUrl} title={sessionId}>
           <QRCodeSVG value={sessionUIUrl} />
-          <p>
-            <a href={sessionUIUrl}>{sessionUIUrl}</a>
-          </p>
-          <p>{sessionId}</p>
-        </>
+        </a>
       )}
     </div>
   );

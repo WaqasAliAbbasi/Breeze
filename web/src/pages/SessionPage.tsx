@@ -1,8 +1,8 @@
 import React from "react";
-import "./App.css";
 import { useParams } from "react-router-dom";
 import { Excalidraw, exportToBlob } from "@excalidraw/excalidraw";
 import { ExcalidrawAPIRefValue } from "@excalidraw/excalidraw/types/types";
+import { Button } from "../components/Button";
 
 const BEAMBORG_SERVER = "/api/v1";
 
@@ -34,6 +34,9 @@ const updateBeamSessionContent = async (
 
 export const SessionPage = () => {
   const { sessionId } = useParams();
+  const [type, setType] = React.useState<"text" | "image" | "draw" | null>(
+    null
+  );
   const [beamSession, setBeamSession] = React.useState<BeamSession | null>(
     null
   );
@@ -111,31 +114,56 @@ export const SessionPage = () => {
   };
 
   return (
-    <>
-      <h1>BeamBorg</h1>
-      <div className="card">
-        <p>{JSON.stringify(beamSession).slice(0, 100)}</p>
-        <textarea
-          rows={4}
-          cols={50}
-          value={textData || ""}
-          onChange={(event) => setTextData(event.target.value)}
-        ></textarea>
-        <button onClick={updateBeamSessionText}>Beam Text</button>
-        <br />
-        <input
-          type="file"
-          id="img"
-          name="img"
-          accept="image/png"
-          onChange={onSelectFile}
-        ></input>
-        <button onClick={updateBeamSessionImage}>Beam Image</button>
-        <div style={{ height: "500px" }}>
-          <Excalidraw ref={(api) => setExcalidrawAPI(api)} />
+    <div>
+      <header className="bg-white shadow-sm">
+        <div className="mx-auto max-w-7xl px-6 py-4">
+          <h1 className="text-lg font-semibold leading-6 text-gray-900">
+            BeamBorg
+          </h1>
         </div>
-        <button onClick={beamDrawing}>Beam Drawing</button>
-      </div>
-    </>
+      </header>
+      <main className="mx-auto max-w-7xl flex flex-col gap-4 items-center py-6 px-6">
+        {beamSession && <p>{JSON.stringify(beamSession).slice(0, 100)}</p>}
+        {!type && (
+          <>
+            <Button onClick={() => setType("text")}>Text</Button>
+            <Button onClick={() => setType("image")}>Image</Button>
+            <Button onClick={() => setType("draw")}>Drawing</Button>
+          </>
+        )}
+        {type && <Button onClick={() => setType(null)}>Back</Button>}
+        {type == "text" && (
+          <>
+            <textarea
+              rows={4}
+              cols={50}
+              value={textData || ""}
+              onChange={(event) => setTextData(event.target.value)}
+            ></textarea>
+            <Button onClick={updateBeamSessionText}>Beam Text</Button>
+          </>
+        )}
+        {type == "image" && (
+          <>
+            <input
+              type="file"
+              id="img"
+              name="img"
+              accept="image/png"
+              onChange={onSelectFile}
+            ></input>
+            <Button onClick={updateBeamSessionImage}>Beam Image</Button>
+          </>
+        )}
+        {type == "draw" && (
+          <>
+            <div style={{ height: "500px", width: "500px" }}>
+              <Excalidraw ref={(api) => setExcalidrawAPI(api)} />
+            </div>
+            <Button onClick={beamDrawing}>Beam Drawing</Button>
+          </>
+        )}
+      </main>
+    </div>
   );
 };

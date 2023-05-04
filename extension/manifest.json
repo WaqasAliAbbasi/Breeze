@@ -3,5 +3,10 @@
   "name": "BeamBorg",
   "version": "1.0.0",
   "permissions": ["clipboardWrite"],
-  "action": { "default_popup": "index.html" }
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "48": "qr.png"
+    }
+  }
 }
