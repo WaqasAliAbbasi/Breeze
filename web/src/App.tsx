@@ -1,5 +1,6 @@
 import { Routes, Route, Link } from "react-router-dom";
 import { SessionPage } from "./pages/SessionPage";
+import { Home } from "./pages/Home";
 
 function App() {
   return (
@@ -14,14 +15,6 @@ function App() {
 }
 
 export default App;
-
-function Home() {
-  return (
-    <div>
-      <h2>Home</h2>
-    </div>
-  );
-}
 
 function NoMatch() {
   return (
