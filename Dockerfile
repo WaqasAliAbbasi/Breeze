@@ -1,15 +1,20 @@
+ARG SERVER_HOSTNAME=https://breeze.fly.dev
+
 FROM node:14-alpine  AS web-build
 WORKDIR /home/web
-COPY ./web /home/web
+COPY ./web/package.json ./extension/package-lock.json /home/web
 RUN npm install
+COPY ./web /home/web
 RUN npm run build
 
 FROM node:14-alpine  AS extension-build
 WORKDIR /home/extension
 RUN apk add --no-cache zip
-COPY ./extension /home/extension
+COPY ./extension/package.json ./extension/package-lock.json /home/extension
 RUN npm install
-RUN npm run build
+COPY ./extension /home/extension
+ARG SERVER_HOSTNAME
+RUN VITE_SERVER_HOSTNAME=$SERVER_HOSTNAME npm run build
 RUN cd dist; zip -r ../breeze-extension.zip *
 
 FROM gradle:7-jdk11 AS grade-build

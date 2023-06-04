@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
-// const SERVER_URL = "https://breeze.fly.dev";
-const SERVER_URL = "http://192.168.0.225:8080";
+const SERVER_HOSTNAME = import.meta.env.VITE_SERVER_HOSTNAME;
 
 type BeamSession = {
   id: string;
@@ -11,7 +10,7 @@ type BeamSession = {
 };
 
 const createNewSession = async () => {
-  const response = await fetch(`${SERVER_URL}/api/v1/session/new`, {
+  const response = await fetch(`${SERVER_HOSTNAME}/api/v1/session/new`, {
     method: "POST",
   });
   const asJson: BeamSession = await response.json();
@@ -19,10 +18,10 @@ const createNewSession = async () => {
 };
 
 const getBeamSessionUrl = (sessionId: string) =>
-  `${SERVER_URL}/api/v1/session/${sessionId}`;
+  `${SERVER_HOSTNAME}/api/v1/session/${sessionId}`;
 
 const getBeamSessionUIUrl = (sessionId: string) =>
-  `${SERVER_URL}/session/${sessionId}`;
+  `${SERVER_HOSTNAME}/session/${sessionId}`;
 
 const fetchBeamSession = async (sessionId: string): Promise<BeamSession> => {
   const response = await fetch(getBeamSessionUrl(sessionId));
