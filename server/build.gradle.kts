@@ -8,21 +8,21 @@ val koin_version: String by project
 plugins {
     kotlin("jvm") version "1.8.20"
     id("io.ktor.plugin") version "2.3.0"
-                id("org.jetbrains.kotlin.plugin.serialization") version "1.8.20"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.20"
 }
 
-group = "org.beamborg"
+group = "org.breeze"
+
 version = "0.0.1"
+
 application {
-    mainClass.set("org.beamborg.ApplicationKt")
+    mainClass.set("org.breeze.ApplicationKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")

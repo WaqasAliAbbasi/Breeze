@@ -1,4 +1,4 @@
-package org.beamborg.plugins
+package org.breeze.plugins
 
 import io.ktor.http.*
 import io.ktor.server.application.*

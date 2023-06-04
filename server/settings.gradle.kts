@@ -1,1 +1,1 @@
-rootProject.name = "org.beamborg.beamborg-server"
+rootProject.name = "org.breeze.breeze-server"

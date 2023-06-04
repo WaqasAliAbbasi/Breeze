@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for beamborg on 2023-04-26T23:38:55+08:00
+# fly.toml app configuration file generated for breeze on 2023-04-26T23:38:55+08:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "beamborg"
+app = "breeze"
 primary_region = "hkg"
 
 [http_service]

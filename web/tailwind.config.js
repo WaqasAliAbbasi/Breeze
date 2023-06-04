@@ -20,7 +20,6 @@ export default {
         "Noto Color Emoji",
       ],
       serif: [
-        "Domine",
         "ui-serif",
         "Georgia",
         "Cambria",
@@ -38,7 +37,7 @@ export default {
         "Courier New",
         "monospace",
       ],
-      "hand-written": ["Sue Ellen Francisco"],
+      hand: ["Square Peg"],
     },
     backgroundImage: {
       paper: "url('/paper-texture.jpg')",

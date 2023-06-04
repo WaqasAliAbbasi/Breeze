@@ -11,7 +11,9 @@ export const Home = () => {
               <span className="sr-only">Breeze</span>
               <img className="h-32 w-32" src="./logo.png" alt="" />
             </div>
-            <h1 className="font-serif text-4xl pt-8">Breeze</h1>
+            <h1 className="font-hand text-6xl pt-8 text-gray-800 font-semibold">
+              breeze
+            </h1>
           </div>
         </nav>
       </header>
@@ -19,8 +21,8 @@ export const Home = () => {
       <main>
         <div className="pt-20 bg-paper bg-cover">
           <div className="mt-12 mx-auto max-w-7xl px-6 py-24 flex flex-col items-center gap-8">
-            <p className="text-5xl leading-8 font-hand-written ">
-              Use all your devices seamlessly.
+            <p className="text-4xl leading-8 font-sans text-gray-800">
+              make use of all your devices
             </p>
             <img src="./all-devices.png" alt="" />
           </div>

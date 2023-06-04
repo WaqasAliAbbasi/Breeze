@@ -4,12 +4,12 @@ import { Excalidraw, exportToBlob } from "@excalidraw/excalidraw";
 import { ExcalidrawAPIRefValue } from "@excalidraw/excalidraw/types/types";
 import { Button } from "../components/Button";
 
-const BEAMBORG_SERVER = "/api/v1";
+const BREEZE_SERVER = "/api/v1";
 
 type BeamSession = { id: string; content?: string };
 
 const getBeamSessionUrl = (sessionId: string) =>
-  `${BEAMBORG_SERVER}/session/${sessionId}`;
+  `${BREEZE_SERVER}/session/${sessionId}`;
 
 const fetchBeamSession = async (sessionId: string): Promise<BeamSession> => {
   const response = await fetch(getBeamSessionUrl(sessionId));
@@ -21,13 +21,10 @@ const updateBeamSessionContent = async (
   sessionId: string,
   formData: FormData
 ): Promise<string> => {
-  const response = await fetch(
-    `${BEAMBORG_SERVER}/session/${sessionId}/upload`,
-    {
-      method: "POST",
-      body: formData,
-    }
-  );
+  const response = await fetch(`${BREEZE_SERVER}/session/${sessionId}/upload`, {
+    method: "POST",
+    body: formData,
+  });
   const textResponse = await response.text();
   return textResponse;
 };
@@ -118,7 +115,7 @@ export const SessionPage = () => {
       <header className="bg-white shadow-sm">
         <div className="mx-auto max-w-7xl px-6 py-4">
           <h1 className="text-lg font-semibold leading-6 text-gray-900">
-            BeamBorg
+            Breeze
           </h1>
         </div>
       </header>

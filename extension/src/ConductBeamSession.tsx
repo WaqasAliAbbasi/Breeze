@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
-// const SERVER_URL = "https://beamborg.fly.dev";
+// const SERVER_URL = "https://breeze.fly.dev";
 const SERVER_URL = "http://192.168.0.225:8080";
 
 type BeamSession = {

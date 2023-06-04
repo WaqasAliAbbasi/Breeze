@@ -13,5 +13,5 @@ RUN gradle buildFatJar --no-daemon
 FROM openjdk:11
 EXPOSE 8080:8080
 RUN mkdir /app
-COPY --from=grade-build /home/server/build/libs/*.jar /app/beamborg-server.jar
-ENTRYPOINT ["java","-jar","/app/beamborg-server.jar"]
+COPY --from=grade-build /home/server/build/libs/*.jar /app/breeze-server.jar
+ENTRYPOINT ["java","-jar","/app/breeze-server.jar"]

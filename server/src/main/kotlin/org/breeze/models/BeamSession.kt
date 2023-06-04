@@ -1,12 +1,19 @@
-package org.beamborg.models
+package org.breeze.models
 
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
 
-enum class BeamSessionContentType { Image, Text }
+enum class BeamSessionContentType {
+    Image,
+    Text
+}
 
 @Serializable
-data class BeamSession(val id: String, val type: BeamSessionContentType? = null, val content: String? = null)
+data class BeamSession(
+        val id: String,
+        val type: BeamSessionContentType? = null,
+        val content: String? = null
+)
 
 const val TEN_MEGABYTES = 1024 * 1024 * 10
 
