@@ -1,3 +1,7 @@
+import { Button } from "../components/Button";
+
+const EXTENSION_ZIP_PATH = "/breeze-extension.zip";
+
 export const Home = () => {
   return (
     <div className="bg-white">
@@ -25,6 +29,9 @@ export const Home = () => {
               make use of all your devices
             </p>
             <img src="./all-devices.png" alt="" />
+            <a href={EXTENSION_ZIP_PATH}>
+              <Button>Install</Button>
+            </a>
           </div>
         </div>
       </main>
