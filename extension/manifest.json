@@ -1,12 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Breeze",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "permissions": ["clipboardWrite"],
+  "description": "Transfer data from your phone to the browser in a breeze.",
+  "icons": {
+    "16": "logo.png",
+    "32": "logo.png",
+    "48": "logo.png",
+    "128": "logo.png"
+  },
   "action": {
-    "default_popup": "index.html",
-    "default_icon": {
-      "48": "qr.png"
-    }
+    "default_popup": "index.html"
   }
 }

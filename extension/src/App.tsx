@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ConductBeamSession } from "./ConductBeamSession";
+import { Button } from "./components/Button";
 
 function App() {
   const [data, setData] = useState<ClipboardItem | null>(null);
@@ -58,14 +59,9 @@ function App() {
         {dataAsBlob && (
           <img src={URL.createObjectURL(dataAsBlob)} width="80%" />
         )}
-        <button
-          type="button"
-          onClick={() => onCopyAndClose()}
-          disabled={!data}
-          className="w-32 rounded-md bg-indigo-600 disabled:bg-indigo-300 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
+        <Button onClick={() => onCopyAndClose()} disabled={!data}>
           Copy and Close
-        </button>
+        </Button>
       </main>
     </div>
   );
